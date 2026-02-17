@@ -1,3 +1,307 @@
+// /* eslint-disable react-hooks/exhaustive-deps */
+// import { useState, useEffect, useCallback } from "react";
+// import { CheckCircle2, Circle, Plus, Trash2 } from "lucide-react";
+// import { Button } from "~/components/ui/button";
+// import { Input } from "~/components/ui/input";
+
+// export const API_BASE = "http://localhost:4001/api/v1/daily-completion";
+
+// export interface Task {
+//   id: number;
+//   task: string;
+//   taskDate: string;
+//   isDone: boolean;
+//   isDeleted: boolean;
+//   created_at: string;
+//   updated_at: string;
+// }
+
+// export type GroupedPlans = Record<string, Task[]>;
+
+// const DailyPlanner = () => {
+//   const [plans, setPlans] = useState<GroupedPlans>({});
+//   const today = new Date().toLocaleDateString("en-CA");
+//   const [selectedDate, setSelectedDate] = useState(today);
+//   const [newTask, setNewTask] = useState("");
+//   const [newDateInput, setNewDateInput] = useState("");
+//   const [loading, setLoading] = useState(true);
+//   const [error, setError] = useState<string | null>(null);
+
+//   console.log(selectedDate, "selected date");
+
+//   // Fetch all tasks and group by date
+//   const fetchTasks = useCallback(async () => {
+//     try {
+//       setError(null);
+//       const res = await fetch(API_BASE);
+//       if (!res.ok) throw new Error("Failed to fetch tasks");
+//       const data: Task[] = await res.json();
+
+//       const grouped: GroupedPlans = {};
+//       for (const task of data) {
+//         if (!task.isDeleted) {
+//           const date = task.taskDate.split("T")[0]; // normalize date
+//           if (!grouped[date]) grouped[date] = [];
+//           grouped[date].push(task);
+//         }
+//       }
+//       setPlans(grouped);
+//     } catch (err) {
+//       setError("Could not load tasks. Is the server running?");
+//     } finally {
+//       setLoading(false);
+//     }
+//   }, []);
+
+//   useEffect(() => {
+//     fetchTasks();
+//   }, [fetchTasks]);
+
+//   const tasks = plans[selectedDate] || [];
+//   const doneCount = tasks.filter((t) => t.isDone).length;
+//   const totalCount = tasks.length;
+//   const pct = totalCount ? Math.round((doneCount / totalCount) * 100) : 0;
+
+//   const dates = Object.keys(plans).sort();
+
+//   // Toggle task done/undone — delete and re-create with toggled isDone
+//   const toggleTask = async (task: Task) => {
+//     try {
+//       // Optimistic UI update
+//       setPlans((prev) => ({
+//         ...prev,
+//         [selectedDate]: prev[selectedDate].map((t) =>
+//           t.id === task.id ? { ...t, isDone: !t.isDone } : t
+//         ),
+//       }));
+
+//       // Delete existing task
+//       const delRes = await fetch(`${API_BASE}/${task.id}`, {
+//         method: "DELETE",
+//       });
+//       if (!delRes.ok) throw new Error("Failed to delete task");
+
+//       // Re-create with toggled isDone
+//       const postRes = await fetch(API_BASE + "/create", {
+//         method: "POST",
+//         headers: { "Content-Type": "application/json" },
+//         body: JSON.stringify({
+//           task: task.task,
+//           taskDate: selectedDate,
+//           isDone: !task.isDone,
+//         }),
+//       });
+//       if (!postRes.ok) throw new Error("Failed to re-create task");
+
+//       // Refresh to get the new id from server
+//       await fetchTasks();
+//     } catch (err) {
+//       setError("Failed to update task.");
+//       await fetchTasks(); // revert to server state
+//     }
+//   };
+
+//   // Add a new task
+//   const addTask = async () => {
+//     if (!newTask.trim()) return;
+//     try {
+//       const res = await fetch(API_BASE + "/create", {
+//         method: "POST",
+//         headers: { "Content-Type": "application/json" },
+//         body: JSON.stringify({
+//           task: newTask.trim(),
+//           taskDate: selectedDate,
+//           isDone: false,
+//         }),
+//       });
+//       if (!res.ok) throw new Error("Failed to add task");
+//       setNewTask("");
+//       await fetchTasks();
+//     } catch (err) {
+//       setError("Failed to add task.");
+//     }
+//   };
+
+//   // Delete a task
+//   const removeTask = async (id: number) => {
+//     try {
+//       // Optimistic UI update
+//       setPlans((prev) => ({
+//         ...prev,
+//         [selectedDate]: prev[selectedDate].filter((t) => t.id !== id),
+//       }));
+
+//       const res = await fetch(`${API_BASE}/${id}`, { method: "DELETE" });
+//       if (!res.ok) throw new Error("Failed to delete task");
+//       await fetchTasks();
+//     } catch (err) {
+//       setError("Failed to delete task.");
+//       await fetchTasks();
+//     }
+//   };
+
+//   // Add a new date tab (just switches to that date; tasks added will go there)
+//   const addNewDate = () => {
+//     if (!newDateInput) return;
+//     if (!plans[newDateInput]) {
+//       setPlans((prev) => ({ ...prev, [newDateInput]: [] }));
+//     }
+//     setSelectedDate(newDateInput);
+//     setNewDateInput("");
+//   };
+
+//   return (
+//     <section className="">
+//       <div className="container">
+//         {error && (
+//           <div className="mb-4 p-3 rounded-lg bg-destructive/10 text-destructive text-sm">
+//             {error}
+//           </div>
+//         )}
+
+//         <div className="grid lg:grid-cols-3 gap-6">
+//           <div className="lg:col-span-2 bg-card border border-border rounded-lg p-6 shadow-card">
+//             {/* Date selector */}
+//             <div className="flex gap-3 mb-4 overflow-x-auto pb-2 items-center">
+//               {dates.map((d) => (
+//                 <button
+//                   key={d}
+//                   onClick={() => setSelectedDate(d)}
+//                   className={`px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap transition-all ${
+//                     d === selectedDate
+//                       ? "bg-primary text-primary-foreground"
+//                       : "bg-secondary text-secondary-foreground hover:bg-muted"
+//                   }`}
+//                 >
+//                   {new Date(d + "T00:00:00").toLocaleDateString("en-US", {
+//                     weekday: "short",
+//                     month: "short",
+//                     day: "numeric",
+//                   })}
+//                 </button>
+//               ))}
+//             </div>
+
+//             {/* Add new date */}
+//             <div className="flex gap-2 mb-6">
+//               <Input
+//                 type="date"
+//                 value={newDateInput}
+//                 onChange={(e) => setNewDateInput(e.target.value)}
+//                 className="w-auto"
+//               />
+//               <Button size="sm" variant="outline" onClick={addNewDate}>
+//                 <Plus className="w-4 h-4 mr-1" /> Add Date
+//               </Button>
+//             </div>
+
+//             {/* Tasks */}
+//             <div className="space-y-3">
+//               {loading ? (
+//                 <p className="text-muted-foreground text-center py-8">
+//                   Loading tasks...
+//                 </p>
+//               ) : tasks.length === 0 ? (
+//                 <p className="text-muted-foreground text-center py-8">
+//                   No tasks planned for this day. Add one below!
+//                 </p>
+//               ) : (
+//                 tasks.map((t) => (
+//                   <div
+//                     key={t.id}
+//                     className={`flex items-center gap-3 p-3 rounded-lg border transition-all cursor-pointer group ${
+//                       t.isDone
+//                         ? "border-primary/30 bg-primary/5"
+//                         : "border-border bg-secondary/30"
+//                     }`}
+//                     onClick={() => toggleTask(t)}
+//                   >
+//                     {t.isDone ? (
+//                       <CheckCircle2 className="w-5 h-5 text-primary flex-shrink-0" />
+//                     ) : (
+//                       <Circle className="w-5 h-5 text-muted-foreground flex-shrink-0" />
+//                     )}
+//                     <span
+//                       className={`flex-1 ${
+//                         t.isDone ? "line-through text-muted-foreground" : ""
+//                       }`}
+//                     >
+//                       {t.task}
+//                     </span>
+//                     <button
+//                       onClick={(e) => {
+//                         e.stopPropagation();
+//                         removeTask(t.id);
+//                       }}
+//                       className="opacity-0 group-hover:opacity-100 transition-opacity text-muted-foreground hover:text-destructive"
+//                     >
+//                       <Trash2 className="w-4 h-4" />
+//                     </button>
+//                   </div>
+//                 ))
+//               )}
+//             </div>
+
+//             {/* Add task */}
+//             <div className="flex gap-2 mt-4">
+//               <Input
+//                 placeholder="Add a new task..."
+//                 value={newTask}
+//                 onChange={(e) => setNewTask(e.target.value)}
+//                 onKeyDown={(e) => e.key === "Enter" && addTask()}
+//               />
+//               <Button onClick={addTask} size="sm">
+//                 <Plus className="w-4 h-4" />
+//               </Button>
+//             </div>
+//           </div>
+
+//           {/* Daily summary */}
+//           <div className="bg-card border border-border rounded-lg p-6 shadow-card flex flex-col items-center justify-center">
+//             <p className="text-sm text-muted-foreground mb-4">Day Completion</p>
+//             <div className="relative w-32 h-32 mb-4">
+//               <svg className="w-32 h-32 -rotate-90" viewBox="0 0 120 120">
+//                 <circle
+//                   cx="60"
+//                   cy="60"
+//                   r="52"
+//                   fill="none"
+//                   className="stroke-secondary"
+//                   strokeWidth="8"
+//                 />
+//                 <circle
+//                   cx="60"
+//                   cy="60"
+//                   r="52"
+//                   fill="none"
+//                   className="stroke-primary"
+//                   strokeWidth="8"
+//                   strokeLinecap="round"
+//                   strokeDasharray={2 * Math.PI * 52}
+//                   strokeDashoffset={
+//                     2 * Math.PI * 52 - (pct / 100) * 2 * Math.PI * 52
+//                   }
+//                   style={{ transition: "stroke-dashoffset 0.6s ease" }}
+//                 />
+//               </svg>
+//               <span className="absolute inset-0 flex items-center justify-center text-3xl font-bold font-display">
+//                 {pct}%
+//               </span>
+//             </div>
+
+//             <p className="text-sm text-muted-foreground">
+//               <span className="text-primary font-semibold">{doneCount}</span> of{" "}
+//               {totalCount} tasks done
+//             </p>
+//           </div>
+//         </div>
+//       </div>
+//     </section>
+//   );
+// };
+
+// export default DailyPlanner;
+
 /* eslint-disable react-hooks/exhaustive-deps */
 import { useState, useEffect, useCallback } from "react";
 import { CheckCircle2, Circle, Plus, Trash2 } from "lucide-react";
@@ -20,9 +324,8 @@ export type GroupedPlans = Record<string, Task[]>;
 
 const DailyPlanner = () => {
   const [plans, setPlans] = useState<GroupedPlans>({});
-  const [selectedDate, setSelectedDate] = useState(
-    new Date().toISOString().split("T")[0]
-  );
+  const today = new Date().toLocaleDateString("en-CA");
+  const [selectedDate, setSelectedDate] = useState(today);
   const [newTask, setNewTask] = useState("");
   const [newDateInput, setNewDateInput] = useState("");
   const [loading, setLoading] = useState(true);
@@ -65,7 +368,7 @@ const DailyPlanner = () => {
 
   const dates = Object.keys(plans).sort();
 
-  // Toggle task done/undone — delete and re-create with toggled isDone
+  // Toggle task done/undone via PATCH
   const toggleTask = async (task: Task) => {
     try {
       // Optimistic UI update
@@ -76,25 +379,14 @@ const DailyPlanner = () => {
         ),
       }));
 
-      // Delete existing task
-      const delRes = await fetch(`${API_BASE}/${task.id}`, {
-        method: "DELETE",
-      });
-      if (!delRes.ok) throw new Error("Failed to delete task");
-
-      // Re-create with toggled isDone
-      const postRes = await fetch(API_BASE + "/create", {
-        method: "POST",
+      const patchRes = await fetch(`${API_BASE}/${task.id}`, {
+        method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          task: task.task,
-          taskDate: selectedDate,
-          isDone: !task.isDone,
-        }),
+        body: JSON.stringify({ isDone: !task.isDone }),
       });
-      if (!postRes.ok) throw new Error("Failed to re-create task");
+      if (!patchRes.ok) throw new Error("Failed to update task");
 
-      // Refresh to get the new id from server
+      // Refresh to sync with server
       await fetchTasks();
     } catch (err) {
       setError("Failed to update task.");

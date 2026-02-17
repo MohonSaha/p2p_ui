@@ -12,7 +12,7 @@ import {
 
 export default function HeroSection() {
   const [plans, setPlans] = useState<GroupedPlans>({});
-  const today = new Date().toISOString().split("T")[0];
+  const today = new Date().toLocaleDateString("en-CA");
   const tasks = plans[today] || [];
   const doneCount = tasks.filter((t) => t.isDone).length;
   const totalCount = tasks.length;

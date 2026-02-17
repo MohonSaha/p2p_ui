@@ -34,7 +34,7 @@ export default function Home() {
         </div>
       </SectionContainer>
 
-      <SectionContainer>
+      {/* <SectionContainer>
         <div className="mt-12">
           <div className="flex items-center gap-3 mb-8">
             <Calendar className="w-6 h-6 text-chart-2" />
@@ -42,7 +42,7 @@ export default function Home() {
           </div>
           <DailyPlanner />
         </div>
-      </SectionContainer>
+      </SectionContainer> */}
 
       {/* <SectionContainer>
         <div className="mt-6 mb-10">

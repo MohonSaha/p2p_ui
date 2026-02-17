@@ -9,6 +9,8 @@ const dayCompletion = () => {
         <div>
           <DailyPlanner />
         </div>
+
+        <div></div>
       </SectionContainer>
     </div>
   );
