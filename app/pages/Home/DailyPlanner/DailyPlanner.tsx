@@ -308,7 +308,9 @@ import { CheckCircle2, Circle, Plus, Trash2 } from "lucide-react";
 import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";
 
-export const API_BASE = "http://localhost:4001/api/v1/daily-completion";
+// export const API_BASE = "http://localhost:4001/api/v1/daily-completion";
+export const API_BASE =
+  "https://p2pserver-production-a821.up.railway.app/api/v1/daily-completion";
 
 export interface Task {
   id: number;

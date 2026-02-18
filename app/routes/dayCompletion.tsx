@@ -1,18 +1,121 @@
-import React from "react";
-import { SectionContainer } from "~/components/shared/SectionContainer";
+// import React from "react";
+// import { SectionContainer } from "~/components/shared/SectionContainer";
+// import DailyPlanner from "~/pages/Home/DailyPlanner/DailyPlanner";
+
+// const dayCompletion = () => {
+//   return (
+//     <div className="pt-28">
+//       <SectionContainer>
+//         <div>
+//           <DailyPlanner />
+//         </div>
+
+//         <div></div>
+//       </SectionContainer>
+//     </div>
+//   );
+// };
+
+// export default dayCompletion;
+
+import { useState } from "react";
+import { ClipboardList, AlertCircle, Layers } from "lucide-react";
+import { useTasks, useTaskStacks } from "~/hooks/use-tasks";
 import DailyPlanner from "~/pages/Home/DailyPlanner/DailyPlanner";
+import DueTasksManager from "~/pages/DailyCompletion/DueTasksManager";
+import { SectionContainer } from "~/components/shared/SectionContainer";
+import TaskStackView from "~/pages/DailyCompletion/TaskStackView";
+
+type Tab = "planner" | "due" | "stacks";
+
+const tabs: { key: Tab; label: string; icon: React.ReactNode }[] = [
+  {
+    key: "planner",
+    label: "Daily Planner",
+    icon: <ClipboardList className="w-4 h-4" />,
+  },
+  { key: "due", label: "Due Tasks", icon: <AlertCircle className="w-4 h-4" /> },
+  { key: "stacks", label: "Task Stacks", icon: <Layers className="w-4 h-4" /> },
+];
 
 const dayCompletion = () => {
-  return (
-    <div className="pt-28">
-      <SectionContainer>
-        <div>
-          <DailyPlanner />
-        </div>
+  const [activeTab, setActiveTab] = useState<Tab>("planner");
+  const {
+    grouped,
+    undoneTasks,
+    loading,
+    addTask,
+    toggleTask,
+    deleteTask,
+    reassignTask,
+  } = useTasks();
+  const stackHook = useTaskStacks();
 
-        <div></div>
-      </SectionContainer>
-    </div>
+  return (
+    <SectionContainer>
+      <div className="min-h-screen bg-dark pt-22">
+        {/* Header */}
+        <header className="border-b border-border bg-dark">
+          <div className="py-5 flex items-center justify-between">
+            <div>
+              <h1 className="text-xl font-bold text-foreground tracking-tight">
+                TaskFlow
+              </h1>
+              <p className="text-xs text-muted-foreground mt-0.5">
+                Stay organized, stay productive
+              </p>
+            </div>
+            <div className="flex items-center gap-1 bg-dark rounded-lg p-1">
+              {tabs.map((tab) => (
+                <button
+                  key={tab.key}
+                  onClick={() => setActiveTab(tab.key)}
+                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-sm font-medium transition-all ${
+                    activeTab === tab.key
+                      ? "bg-primary text-primary-foreground shadow-[var(--shadow-sm)]"
+                      : "text-muted-foreground hover:text-foreground"
+                  }`}
+                >
+                  {tab.icon}
+                  <span className="hidden sm:inline">{tab.label}</span>
+                </button>
+              ))}
+            </div>
+          </div>
+        </header>
+
+        {/* Content */}
+        <main className="py-6">
+          {activeTab === "planner" && (
+            <DailyPlanner
+              grouped={grouped}
+              loading={loading}
+              addTask={addTask}
+              toggleTask={toggleTask}
+              deleteTask={deleteTask}
+            />
+          )}
+          {activeTab === "due" && (
+            <DueTasksManager
+              undoneTasks={undoneTasks}
+              deleteTask={deleteTask}
+              reassignTask={reassignTask}
+            />
+          )}
+          {activeTab === "stacks" && (
+            <TaskStackView
+              stacks={stackHook.stacks}
+              addStack={stackHook.addStack}
+              deleteStack={stackHook.deleteStack}
+              addSubtask={stackHook.addSubtask}
+              toggleSubtask={stackHook.toggleSubtask}
+              deleteSubtask={stackHook.deleteSubtask}
+              reassignSubtask={stackHook.reassignSubtask}
+            />
+          )}
+        </main>
+      </div>
+    </SectionContainer>
   );
 };
 

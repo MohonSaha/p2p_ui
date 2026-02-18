@@ -84,7 +84,9 @@ export default function HeroSection() {
       label: "Day Completion",
       value: "142",
       icon: Clock,
-      change: "This month",
+      change: plans[today]?.length
+        ? `${doneCount} / ${totalCount} today`
+        : "No tasks today",
       modal: {
         headline: "142 hours logged across all projects this month.",
         description:
