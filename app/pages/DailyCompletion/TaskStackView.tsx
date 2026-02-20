@@ -8,6 +8,7 @@ import {
   ChevronDown,
   ChevronRight,
   Layers,
+  Minus,
 } from "lucide-react";
 import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";
@@ -91,18 +92,29 @@ const TaskStackView = ({
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
-        <div>
-          <h2 className="text-lg font-semibold text-foreground">Task Stacks</h2>
-          <p className="text-sm text-muted-foreground">
-            Organize tasks into projects with subtasks
-          </p>
-        </div>
         <Button
-          size="sm"
           onClick={() => setShowForm(!showForm)}
           variant={showForm ? "secondary" : "default"}
+          className="
+    w-full 
+    h-12
+    rounded-xl 
+    text-base 
+    font-semibold
+    justify-center 
+    gap-2
+    shadow-md 
+    transition-all 
+    active:scale-[0.98]
+    cursor-pointer
+  "
         >
-          <Plus className="w-4 h-4 mr-1" /> New Stack
+          {showForm ? (
+            <Minus className="w-5 h-5" />
+          ) : (
+            <Plus className="w-5 h-5" />
+          )}
+          Create New Stack
         </Button>
       </div>
 

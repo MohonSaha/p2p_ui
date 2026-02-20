@@ -36,8 +36,8 @@ const dayCompletion = () => {
       <div className="min-h-screen bg-dark pt-22">
         {/* Header */}
         <header className="border-b border-border bg-dark">
-          <div className="py-2 flex items-center justify-end sm:justify-between w-full">
-            <div className="hidden sm:block">
+          <div className="py-2 flex items-center justify-between w-full">
+            <div className="">
               <h1 className="text-xl font-bold text-foreground tracking-tight">
                 TaskFlow
               </h1>
@@ -78,9 +78,9 @@ const dayCompletion = () => {
           )}
           {activeTab === "due" && (
             <DueTasksManager
-              undoneTasks={undoneTasks}
-              deleteTask={deleteTask}
-              reassignTask={reassignTask}
+            // undoneTasks={undoneTasks}
+            // deleteTask={deleteTask}
+            // reassignTask={reassignTask}
             />
           )}
           {activeTab === "stacks" && (

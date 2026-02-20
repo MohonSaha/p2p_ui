@@ -1,6 +1,6 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import { useState, useEffect, useCallback, useRef } from "react";
-import { CheckCircle2, Circle, Plus, Trash2 } from "lucide-react";
+import { CheckCircle2, Circle, Loader2, Plus, Trash2 } from "lucide-react";
 import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";
 
@@ -212,9 +212,12 @@ const DailyPlanner = () => {
             {/* Tasks */}
             <div className="space-y-3">
               {loading ? (
-                <p className="text-muted-foreground text-center py-8">
-                  Loading tasks...
-                </p>
+                <div className="flex items-center justify-center py-12">
+                  <Loader2 className="w-5 h-5 animate-spin text-muted-foreground" />
+                  <span className="ml-2 text-muted-foreground">
+                    Loading tasks...
+                  </span>
+                </div>
               ) : tasks.length === 0 ? (
                 <p className="text-muted-foreground text-center py-8">
                   No tasks planned for this day. Add one below!
