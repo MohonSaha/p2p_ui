@@ -4,7 +4,9 @@
 // import { Button } from "~/components/ui/button";
 // import { Input } from "~/components/ui/input";
 
-// export const API_BASE = "http://localhost:4001/api/v1/daily-completion";
+// // export const API_BASE = "http://localhost:4001/api/v1/daily-completion";
+// export const API_BASE =
+//   "https://p2pserver-production-a821.up.railway.app/api/v1/daily-completion";
 
 // export interface Task {
 //   id: number;
@@ -64,7 +66,7 @@
 
 //   const dates = Object.keys(plans).sort();
 
-//   // Toggle task done/undone — delete and re-create with toggled isDone
+//   // Toggle task done/undone via PATCH
 //   const toggleTask = async (task: Task) => {
 //     try {
 //       // Optimistic UI update
@@ -75,25 +77,14 @@
 //         ),
 //       }));
 
-//       // Delete existing task
-//       const delRes = await fetch(`${API_BASE}/${task.id}`, {
-//         method: "DELETE",
-//       });
-//       if (!delRes.ok) throw new Error("Failed to delete task");
-
-//       // Re-create with toggled isDone
-//       const postRes = await fetch(API_BASE + "/create", {
-//         method: "POST",
+//       const patchRes = await fetch(`${API_BASE}/${task.id}`, {
+//         method: "PATCH",
 //         headers: { "Content-Type": "application/json" },
-//         body: JSON.stringify({
-//           task: task.task,
-//           taskDate: selectedDate,
-//           isDone: !task.isDone,
-//         }),
+//         body: JSON.stringify({ isDone: !task.isDone }),
 //       });
-//       if (!postRes.ok) throw new Error("Failed to re-create task");
+//       if (!patchRes.ok) throw new Error("Failed to update task");
 
-//       // Refresh to get the new id from server
+//       // Refresh to sync with server
 //       await fetchTasks();
 //     } catch (err) {
 //       setError("Failed to update task.");
@@ -303,7 +294,7 @@
 // export default DailyPlanner;
 
 /* eslint-disable react-hooks/exhaustive-deps */
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { CheckCircle2, Circle, Plus, Trash2 } from "lucide-react";
 import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";
@@ -327,13 +318,12 @@ export type GroupedPlans = Record<string, Task[]>;
 const DailyPlanner = () => {
   const [plans, setPlans] = useState<GroupedPlans>({});
   const today = new Date().toLocaleDateString("en-CA");
+  const tomorrow = new Date(Date.now() + 86400000).toLocaleDateString("en-CA");
   const [selectedDate, setSelectedDate] = useState(today);
   const [newTask, setNewTask] = useState("");
-  const [newDateInput, setNewDateInput] = useState("");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-
-  console.log(selectedDate, "selected date");
+  const datePickerRef = useRef<HTMLInputElement>(null);
 
   // Fetch all tasks and group by date
   const fetchTasks = useCallback(async () => {
@@ -346,7 +336,7 @@ const DailyPlanner = () => {
       const grouped: GroupedPlans = {};
       for (const task of data) {
         if (!task.isDeleted) {
-          const date = task.taskDate.split("T")[0]; // normalize date
+          const date = task.taskDate.split("T")[0];
           if (!grouped[date]) grouped[date] = [];
           grouped[date].push(task);
         }
@@ -368,12 +358,41 @@ const DailyPlanner = () => {
   const totalCount = tasks.length;
   const pct = totalCount ? Math.round((doneCount / totalCount) * 100) : 0;
 
-  const dates = Object.keys(plans).sort();
+  // Build the fixed date tabs: only today and tomorrow if they exist in DB
+  const fixedDates = [today, tomorrow].filter((d) => plans[d]);
+
+  // If selectedDate is something other than today/tomorrow, include it too
+  const visibleDates = fixedDates.includes(selectedDate)
+    ? fixedDates
+    : selectedDate
+    ? [...fixedDates, selectedDate].slice(0, 3)
+    : fixedDates;
+
+  const handlePlusClick = () => {
+    datePickerRef.current?.showPicker?.();
+    datePickerRef.current?.click();
+  };
+
+  const handleDatePickerChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const picked = e.target.value;
+    if (!picked) return;
+    if (!plans[picked]) {
+      setPlans((prev) => ({ ...prev, [picked]: [] }));
+    }
+    setSelectedDate(picked);
+    e.target.value = "";
+  };
+
+  const formatDateLabel = (d: string) =>
+    new Date(d + "T00:00:00").toLocaleDateString("en-US", {
+      weekday: "short",
+      month: "short",
+      day: "numeric",
+    });
 
   // Toggle task done/undone via PATCH
   const toggleTask = async (task: Task) => {
     try {
-      // Optimistic UI update
       setPlans((prev) => ({
         ...prev,
         [selectedDate]: prev[selectedDate].map((t) =>
@@ -388,11 +407,10 @@ const DailyPlanner = () => {
       });
       if (!patchRes.ok) throw new Error("Failed to update task");
 
-      // Refresh to sync with server
       await fetchTasks();
     } catch (err) {
       setError("Failed to update task.");
-      await fetchTasks(); // revert to server state
+      await fetchTasks();
     }
   };
 
@@ -420,7 +438,6 @@ const DailyPlanner = () => {
   // Delete a task
   const removeTask = async (id: number) => {
     try {
-      // Optimistic UI update
       setPlans((prev) => ({
         ...prev,
         [selectedDate]: prev[selectedDate].filter((t) => t.id !== id),
@@ -435,16 +452,6 @@ const DailyPlanner = () => {
     }
   };
 
-  // Add a new date tab (just switches to that date; tasks added will go there)
-  const addNewDate = () => {
-    if (!newDateInput) return;
-    if (!plans[newDateInput]) {
-      setPlans((prev) => ({ ...prev, [newDateInput]: [] }));
-    }
-    setSelectedDate(newDateInput);
-    setNewDateInput("");
-  };
-
   return (
     <section className="">
       <div className="container">
@@ -457,8 +464,28 @@ const DailyPlanner = () => {
         <div className="grid lg:grid-cols-3 gap-6">
           <div className="lg:col-span-2 bg-card border border-border rounded-lg p-6 shadow-card">
             {/* Date selector */}
-            <div className="flex gap-3 mb-4 overflow-x-auto pb-2 items-center">
-              {dates.map((d) => (
+            <div className="flex gap-3 mb-6 overflow-x-auto pb-2 items-center">
+              {/* Plus button — always first */}
+              <div className="relative flex-shrink-0">
+                <button
+                  onClick={handlePlusClick}
+                  className="px-3 py-2 rounded-lg text-sm font-medium whitespace-nowrap transition-all bg-secondary text-secondary-foreground hover:bg-muted flex items-center gap-1"
+                  title="Pick a date"
+                >
+                  <Plus className="w-4 h-4" />
+                </button>
+                {/* Hidden date input */}
+                <input
+                  ref={datePickerRef}
+                  type="date"
+                  onChange={handleDatePickerChange}
+                  className="absolute inset-0 opacity-0 w-full h-full cursor-pointer"
+                  tabIndex={-1}
+                />
+              </div>
+
+              {/* Date tabs */}
+              {visibleDates.map((d) => (
                 <button
                   key={d}
                   onClick={() => setSelectedDate(d)}
@@ -468,26 +495,13 @@ const DailyPlanner = () => {
                       : "bg-secondary text-secondary-foreground hover:bg-muted"
                   }`}
                 >
-                  {new Date(d + "T00:00:00").toLocaleDateString("en-US", {
-                    weekday: "short",
-                    month: "short",
-                    day: "numeric",
-                  })}
+                  {d === today
+                    ? "Today"
+                    : d === tomorrow
+                    ? "Tomorrow"
+                    : formatDateLabel(d)}
                 </button>
               ))}
-            </div>
-
-            {/* Add new date */}
-            <div className="flex gap-2 mb-6">
-              <Input
-                type="date"
-                value={newDateInput}
-                onChange={(e) => setNewDateInput(e.target.value)}
-                className="w-auto"
-              />
-              <Button size="sm" variant="outline" onClick={addNewDate}>
-                <Plus className="w-4 h-4 mr-1" /> Add Date
-              </Button>
             </div>
 
             {/* Tasks */}

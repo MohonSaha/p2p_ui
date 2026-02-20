@@ -1,23 +1,3 @@
-// import React from "react";
-// import { SectionContainer } from "~/components/shared/SectionContainer";
-// import DailyPlanner from "~/pages/Home/DailyPlanner/DailyPlanner";
-
-// const dayCompletion = () => {
-//   return (
-//     <div className="pt-28">
-//       <SectionContainer>
-//         <div>
-//           <DailyPlanner />
-//         </div>
-
-//         <div></div>
-//       </SectionContainer>
-//     </div>
-//   );
-// };
-
-// export default dayCompletion;
-
 import { useState } from "react";
 import { ClipboardList, AlertCircle, Layers } from "lucide-react";
 import { useTasks, useTaskStacks } from "~/hooks/use-tasks";
@@ -56,8 +36,8 @@ const dayCompletion = () => {
       <div className="min-h-screen bg-dark pt-22">
         {/* Header */}
         <header className="border-b border-border bg-dark">
-          <div className="py-5 flex items-center justify-between">
-            <div>
+          <div className="py-2 flex items-center justify-end sm:justify-between w-full">
+            <div className="hidden sm:block">
               <h1 className="text-xl font-bold text-foreground tracking-tight">
                 TaskFlow
               </h1>
@@ -65,12 +45,13 @@ const dayCompletion = () => {
                 Stay organized, stay productive
               </p>
             </div>
+
             <div className="flex items-center gap-1 bg-dark rounded-lg p-1">
               {tabs.map((tab) => (
                 <button
                   key={tab.key}
                   onClick={() => setActiveTab(tab.key)}
-                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-sm font-medium transition-all ${
+                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-sm font-medium transition-all cursor-pointer ${
                     activeTab === tab.key
                       ? "bg-primary text-primary-foreground shadow-[var(--shadow-sm)]"
                       : "text-muted-foreground hover:text-foreground"
