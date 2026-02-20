@@ -13,6 +13,7 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import { Sheet, SheetContent, SheetTrigger } from "../ui/sheet";
 import { Link, NavLink } from "react-router";
+import TimeTrackerButton from "./TimeTracker/TimeTrackerButton";
 
 const navigation = [
   { name: "Home", href: "/" },
@@ -29,7 +30,7 @@ export function Navbar() {
         <div className="flex items-center gap-2">
           <NavLink to="/" className="flex items-center space-x-2">
             <span className="inline-block h-6 w-6 rounded-full bg-primary"></span>
-            <span className="text-xl font-bold">SAHA AGENCY</span>
+            <span className="text-xl font-bold">P@P</span>
           </NavLink>
         </div>
 
@@ -43,8 +44,12 @@ export function Navbar() {
         </nav>
 
         <div className="flex items-center ">
+          <div className="mr-1">
+            <TimeTrackerButton />
+          </div>
+
           {/* User dropdown */}
-          <DropdownMenu>
+          {/* <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" size="icon" className="rounded-full">
                 <Avatar className="md:h-10 md:w-10 h-8 w-8 cursor-pointer">
@@ -65,7 +70,7 @@ export function Navbar() {
               <DropdownMenuSeparator />
               <DropdownMenuItem>Log out</DropdownMenuItem>
             </DropdownMenuContent>
-          </DropdownMenu>
+          </DropdownMenu> */}
 
           {/* Mobile menu button */}
           <Sheet open={isOpen} onOpenChange={setIsOpen}>

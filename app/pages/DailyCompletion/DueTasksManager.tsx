@@ -11,7 +11,8 @@ import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "~/lib/utils";
 
 // API Configuration
-const API_BASE = "http://localhost:4001/api/v1/daily-completion";
+const API_BASE =
+  "https://p2pserver-production-a821.up.railway.app/api/v1/daily-completion";
 
 // Task interface matching API response
 interface Task {

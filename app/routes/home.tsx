@@ -11,6 +11,7 @@ import type { Route } from "../+types/root";
 import DailyPlanner from "~/pages/Home/DailyPlanner/DailyPlanner";
 import ProgressCharts from "~/pages/Home/ProgressCharts/ProgressCharts";
 import { Calendar } from "lucide-react";
+import TimeTrackerButton from "~/components/shared/TimeTracker/TimeTrackerButton";
 
 export function meta({}: Route.MetaArgs) {
   return [
@@ -26,6 +27,10 @@ export default function Home() {
         <div className="pt-16">
           <HeroSection />
         </div>
+      </SectionContainer>
+
+      <SectionContainer>
+        <TimeTrackerButton />
       </SectionContainer>
 
       <SectionContainer>
