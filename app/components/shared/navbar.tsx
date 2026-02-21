@@ -19,6 +19,7 @@ const navigation = [
   { name: "Home", href: "/" },
   { name: "p2p", href: "p2p" },
   { name: "Day Completion", href: "day-completion" },
+  { name: "Monthly Map", href: "monthly-map" },
 ];
 
 export function Navbar() {

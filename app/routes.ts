@@ -18,6 +18,11 @@ export default [
     // route(":date", "./routes/dayCompletionDate.tsx"),
   ]),
 
+  ...prefix("monthly-map", [
+    index("./routes/monthlyMap.tsx"),
+    // route(":month", "./routes/monthlyMapMonth.tsx"),
+  ]),
+
   ...prefix("listings", [
     index("./routes/listings.tsx"),
     route(":listing", "./routes/listing.tsx"),

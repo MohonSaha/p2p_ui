@@ -2,6 +2,7 @@ import HeroSection from "~/pages/Home/HeroSection/HeroSection";
 import { SectionContainer } from "~/components/shared/SectionContainer";
 import type { Route } from "../+types/root";
 import ProgressCharts from "~/pages/Home/ProgressCharts/ProgressCharts";
+import MonthlyMap from "./monthlyMap";
 
 export function meta({}: Route.MetaArgs) {
   return [
@@ -13,6 +14,12 @@ export function meta({}: Route.MetaArgs) {
 export default function Home() {
   return (
     <>
+      {/* <SectionContainer> */}
+      {/* <div className="pt-16"> */}
+      <MonthlyMap />
+      {/* </div> */}
+      {/* </SectionContainer> */}
+
       <SectionContainer>
         <div className="pt-16">
           <HeroSection />
