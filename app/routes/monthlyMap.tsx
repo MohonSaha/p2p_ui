@@ -139,7 +139,7 @@ import { AddGoalDialog } from "~/pages/MonthlyMap/AddGoalDialog";
 import { MonthPickerDialog } from "~/pages/MonthlyMap/MonthPickerDialog";
 import { SectionContainer } from "~/components/shared/SectionContainer";
 
-const BASE_URL = "http://localhost:4001"; // replace {{test}} with your env var
+const BASE_URL = "https://p2pserver-production-a821.up.railway.app"; // replace {{test}} with your env var
 
 export interface ApiGoal {
   id: number;

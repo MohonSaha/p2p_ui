@@ -103,7 +103,8 @@ import {
 import type { GoalValueType } from "~/types/monthly-map";
 
 const API_BASE =
-  import.meta.env.VITE_API_BASE_URL ?? "http://localhost:4001/api/v1";
+  import.meta.env.VITE_API_BASE_URL ??
+  "https://p2pserver-production-a821.up.railway.app/api/v1";
 
 interface Props {
   open: boolean;
