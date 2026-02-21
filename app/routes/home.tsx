@@ -1,17 +1,7 @@
 import HeroSection from "~/pages/Home/HeroSection/HeroSection";
-import RealEstateSearch from "~/pages/Home/RealEstateSearch/RealEstateSearch";
-import PropertyListingsSlider from "~/pages/Home/PropertyListingsSlider/PropertyListingsSlider";
-import PropertyListing from "~/pages/Home/PropertyListing/PropertyListing";
-import FAQSection from "~/components/shared/FAQSection";
-import TextMarquee from "~/pages/Home/TextMarquee/TextMarquee";
-import ImageGallery from "~/pages/Home/ImageGallery/ImageGallery";
-import ContactSection from "~/components/shared/ContactSection";
 import { SectionContainer } from "~/components/shared/SectionContainer";
 import type { Route } from "../+types/root";
-import DailyPlanner from "~/pages/Home/DailyPlanner/DailyPlanner";
 import ProgressCharts from "~/pages/Home/ProgressCharts/ProgressCharts";
-import { Calendar } from "lucide-react";
-import TimeTrackerButton from "~/components/shared/TimeTracker/TimeTrackerButton";
 
 export function meta({}: Route.MetaArgs) {
   return [
@@ -29,9 +19,9 @@ export default function Home() {
         </div>
       </SectionContainer>
 
-      <SectionContainer>
+      {/* <SectionContainer>
         <TimeTrackerButton />
-      </SectionContainer>
+      </SectionContainer> */}
 
       <SectionContainer>
         <div className="mt-12">
