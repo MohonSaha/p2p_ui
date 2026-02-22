@@ -31,7 +31,7 @@ export function Navbar() {
         <div className="flex items-center gap-2">
           <NavLink to="/" className="flex items-center space-x-2">
             <span className="inline-block h-6 w-6 rounded-full bg-primary"></span>
-            <span className="text-xl font-bold">P@P</span>
+            <span className="text-xl font-bold">P2P</span>
           </NavLink>
         </div>
 

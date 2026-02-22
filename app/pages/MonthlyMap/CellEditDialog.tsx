@@ -50,7 +50,7 @@ export function CellEditDialog({
         else setTextValue(currentValue || "");
       }}
     >
-      <DialogContent className="max-w-sm">
+      <DialogContent className="max-w-xs sm:max-w-md">
         <DialogHeader>
           <DialogTitle className="text-base">
             {goal.name}

@@ -173,7 +173,7 @@ export function AddGoalDialog({ open, onClose, onAdd, goalDate }: Props) {
 
   return (
     <Dialog open={open} onOpenChange={(o) => !o && handleClose()}>
-      <DialogContent className="sm:max-w-md">
+      <DialogContent className="max-w-xs sm:max-w-md">
         <DialogHeader>
           <DialogTitle>Add New Goal</DialogTitle>
         </DialogHeader>
