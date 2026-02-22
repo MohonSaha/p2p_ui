@@ -23,6 +23,11 @@ export default [
     // route(":month", "./routes/monthlyMapMonth.tsx"),
   ]),
 
+  ...prefix("/time-graph", [
+    index("./routes/timeGraph.tsx"),
+    // route(":month", "./routes/monthlyMapMonth.tsx"),
+  ]),
+
   ...prefix("listings", [
     index("./routes/listings.tsx"),
     route(":listing", "./routes/listing.tsx"),

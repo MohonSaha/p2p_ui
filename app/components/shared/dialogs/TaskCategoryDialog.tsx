@@ -53,7 +53,7 @@
 //     try {
 //       setFetchLoading(true);
 //       setError(null);
-//       const res = await fetch("http://localhost:4001/api/v1/task-category");
+//       const res = await fetch("https://p2pserver-production-a821.up.railway.app/api/v1/task-category");
 //       if (!res.ok) throw new Error("Failed to fetch categories");
 //       const data: Category[] = await res.json();
 //       setCategories(data);
@@ -192,7 +192,9 @@ const TaskCategoryDialog = ({
     try {
       setFetchLoading(true);
       setError(null);
-      const res = await fetch("http://localhost:4001/api/v1/task-category");
+      const res = await fetch(
+        "https://p2pserver-production-a821.up.railway.app/api/v1/task-category"
+      );
       if (!res.ok) throw new Error("Failed to fetch categories");
       const data: Category[] = await res.json();
       setCategories(data);

@@ -14,7 +14,8 @@ export interface TaskCategory {
   updated_at: string;
 }
 
-const BASE_URL = "http://localhost:4001/api/v1/task-category";
+const BASE_URL =
+  "https://p2pserver-production-a821.up.railway.app/api/v1/task-category";
 
 const TaskCategory = () => {
   const [categories, setCategories] = useState<TaskCategory[]>([]);

@@ -17,9 +17,10 @@ import TimeTrackerButton from "./TimeTracker/TimeTrackerButton";
 
 const navigation = [
   { name: "Home", href: "/" },
-  { name: "p2p", href: "p2p" },
+  // { name: "p2p", href: "p2p" },
   { name: "Day Completion", href: "day-completion" },
   { name: "Monthly Map", href: "monthly-map" },
+  { name: "Time Graph", href: "time-graph" },
 ];
 
 export function Navbar() {
