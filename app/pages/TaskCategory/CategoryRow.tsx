@@ -43,7 +43,7 @@ export const CategoryRow = ({ category, onUpdate, onDelete }: Props) => {
   };
 
   return (
-    <div className="flex items-center justify-between gap-2 rounded-lg border bg-card p-4 text-center shadow-sm flex-1 min-w-xs">
+    <div className="flex items-center justify-between gap-2 rounded-lg border bg-card p-4 text-center shadow-sm flex-1 min-w-xs max-w-md">
       {editing ? (
         <>
           <Input
