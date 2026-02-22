@@ -1,12 +1,13 @@
 import { useState } from "react";
-import { ClipboardList, AlertCircle, Layers } from "lucide-react";
+import { ClipboardList, AlertCircle, Layers, SwatchBook } from "lucide-react";
 import { useTasks, useTaskStacks } from "~/hooks/use-tasks";
 import DailyPlanner from "~/pages/Home/DailyPlanner/DailyPlanner";
 import DueTasksManager from "~/pages/DailyCompletion/DueTasksManager";
 import { SectionContainer } from "~/components/shared/SectionContainer";
 import TaskStackView from "~/pages/DailyCompletion/TaskStackView";
+import TaskCategory from "~/pages/TaskCategory/TaskCategory";
 
-type Tab = "planner" | "due" | "stacks";
+type Tab = "planner" | "due" | "stacks" | "category";
 
 const tabs: { key: Tab; label: string; icon: React.ReactNode }[] = [
   {
@@ -16,6 +17,11 @@ const tabs: { key: Tab; label: string; icon: React.ReactNode }[] = [
   },
   { key: "due", label: "Due Tasks", icon: <AlertCircle className="w-4 h-4" /> },
   { key: "stacks", label: "Task Stacks", icon: <Layers className="w-4 h-4" /> },
+  {
+    key: "category",
+    label: "Category",
+    icon: <SwatchBook className="w-4 h-4" />,
+  },
 ];
 
 const dayCompletion = () => {
@@ -76,13 +82,7 @@ const dayCompletion = () => {
               deleteTask={deleteTask}
             />
           )}
-          {activeTab === "due" && (
-            <DueTasksManager
-            // undoneTasks={undoneTasks}
-            // deleteTask={deleteTask}
-            // reassignTask={reassignTask}
-            />
-          )}
+          {activeTab === "due" && <DueTasksManager />}
           {activeTab === "stacks" && (
             <TaskStackView
               stacks={stackHook.stacks}
@@ -94,6 +94,8 @@ const dayCompletion = () => {
               reassignSubtask={stackHook.reassignSubtask}
             />
           )}
+
+          {activeTab === "category" && <TaskCategory></TaskCategory>}
         </main>
       </div>
     </SectionContainer>
