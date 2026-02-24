@@ -55,7 +55,7 @@ const CustomTooltip = ({ active, payload, label }: any) => {
   return null;
 };
 
-export function MonthlyBarChart({ entries }: MonthlyBarChartProps) {
+export function WeeklyBarChart({ entries }: MonthlyBarChartProps) {
   const today = new Date();
   const [dateRange, setDateRange] = useState<{ from: Date; to: Date }>({
     from: startOfMonth(today),

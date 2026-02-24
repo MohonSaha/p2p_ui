@@ -9,9 +9,7 @@ import {
 } from "~/components/ui/select";
 import { Loader2, Play, Pause, Square } from "lucide-react";
 import { useTimeTracker } from "~/context/TimeTrackerContext";
-
-const API_BASE =
-  "https://p2pserver-production-a821.up.railway.app/api/v1/time-entry";
+import { VITE_BASE_API } from "~/lib/serverUrls";
 
 interface Task {
   id: number;
@@ -50,7 +48,9 @@ const LiveTimeTracker = ({ onClose }: LiveTimeTrackerProps) => {
   const fetchTodaysTasks = useCallback(async () => {
     try {
       setError(null);
-      const res = await fetch(`${API_BASE}/today/tasks`);
+      const res = await fetch(
+        `${VITE_BASE_API}/daily-completion/today-tasks?isDone=false`
+      );
       if (!res.ok) throw new Error("Failed to fetch tasks");
       const data: Task[] = await res.json();
       setTasks(data);
@@ -96,7 +96,7 @@ const LiveTimeTracker = ({ onClose }: LiveTimeTrackerProps) => {
       setError(null);
       const today = new Date().toISOString().split("T")[0];
 
-      const res = await fetch(`${API_BASE}/create`, {
+      const res = await fetch(`${VITE_BASE_API}/time-entry/create`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -134,16 +134,19 @@ const LiveTimeTracker = ({ onClose }: LiveTimeTrackerProps) => {
       const minutes = Math.floor((seconds % 3600) / 60);
       const secs = seconds % 60;
 
-      const res = await fetch(`${API_BASE}/${entryId}/complete`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          endTime: new Date().toISOString(),
-          hours,
-          minutes,
-          seconds: secs,
-        }),
-      });
+      const res = await fetch(
+        `${VITE_BASE_API}/time-entry/${entryId}/complete`,
+        {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            endTime: new Date().toISOString(),
+            hours,
+            minutes,
+            seconds: secs,
+          }),
+        }
+      );
 
       if (!res.ok) throw new Error("Failed to stop time entry");
 

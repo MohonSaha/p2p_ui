@@ -9,9 +9,7 @@ import {
   SelectValue,
 } from "~/components/ui/select";
 import { Loader2 } from "lucide-react";
-
-const API_BASE =
-  "https://p2pserver-production-a821.up.railway.app/api/v1/time-entry";
+import { VITE_BASE_API } from "~/lib/serverUrls";
 
 interface Task {
   id: number;
@@ -44,7 +42,9 @@ const ManualTimeEntry = ({ onClose }: ManualTimeEntryProps) => {
     try {
       setError(null);
       setLoading(true);
-      const res = await fetch(`${API_BASE}/date/${date}/tasks`);
+      const res = await fetch(
+        `${VITE_BASE_API}/daily-completion/date/${date}/tasks?isDone=false`
+      );
       if (!res.ok) throw new Error("Failed to fetch tasks");
       const data: Task[] = await res.json();
       setTasks(data);
@@ -88,7 +88,7 @@ const ManualTimeEntry = ({ onClose }: ManualTimeEntryProps) => {
       setIsSubmitting(true);
       setError(null);
 
-      const res = await fetch(`${API_BASE}/create`, {
+      const res = await fetch(`${VITE_BASE_API}/time-entry/create`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
