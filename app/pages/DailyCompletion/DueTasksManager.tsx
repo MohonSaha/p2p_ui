@@ -9,10 +9,7 @@ import {
 import { Calendar } from "~/components/ui/calendar";
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "~/lib/utils";
-
-// API Configuration
-const API_BASE =
-  "https://p2pserver-production-a821.up.railway.app/api/v1/daily-completion";
+import { VITE_BASE_API } from "~/lib/serverUrls";
 
 // Task interface matching API response
 interface Task {
@@ -40,7 +37,7 @@ const DueTasksManager = () => {
     try {
       setLoading(true);
       setError(null);
-      const res = await fetch(`${API_BASE}/due-tasks`);
+      const res = await fetch(`${VITE_BASE_API}/daily-completion/due-tasks`);
       if (!res.ok) throw new Error("Failed to fetch due tasks");
       const data: Task[] = await res.json();
       // Filter out deleted tasks and sort by date
@@ -65,7 +62,9 @@ const DueTasksManager = () => {
   const handleDeleteTask = async (id: number) => {
     try {
       setDeletingId(id);
-      const res = await fetch(`${API_BASE}/${id}`, { method: "DELETE" });
+      const res = await fetch(`${VITE_BASE_API}/daily-completion/${id}`, {
+        method: "DELETE",
+      });
       if (!res.ok) throw new Error("Failed to delete task");
       setTasks((prev) => prev.filter((t) => t.id !== id));
     } catch (err) {
@@ -81,7 +80,7 @@ const DueTasksManager = () => {
     try {
       setUpdatingId(id);
       const dateStr = newDate.toLocaleDateString("en-CA");
-      const res = await fetch(`${API_BASE}/${id}`, {
+      const res = await fetch(`${VITE_BASE_API}/daily-completion/${id}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ taskDate: dateStr }),

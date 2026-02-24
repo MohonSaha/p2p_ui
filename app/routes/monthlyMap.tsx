@@ -11,8 +11,7 @@ import { GoalTable } from "~/pages/MonthlyMap/GoalTable";
 import { AddGoalDialog } from "~/pages/MonthlyMap/AddGoalDialog";
 import { MonthPickerDialog } from "~/pages/MonthlyMap/MonthPickerDialog";
 import { SectionContainer } from "~/components/shared/SectionContainer";
-
-const BASE_URL = "https://p2pserver-production-a821.up.railway.app"; // replace {{test}} with your env var
+import { VITE_BASE_API } from "~/lib/serverUrls";
 
 export interface ApiGoal {
   id: number;
@@ -51,7 +50,7 @@ const MonthlyMap = () => {
     setError(null);
     try {
       const res = await fetch(
-        `${BASE_URL}/api/v1/monthly-goal/month/${month}/tracker`
+        `${VITE_BASE_API}/monthly-goal/month/${month}/tracker`
       );
       if (!res.ok) throw new Error(`Failed to fetch: ${res.status}`);
       const data: ApiGoal[] = await res.json();
@@ -92,7 +91,7 @@ const MonthlyMap = () => {
     }
 
     try {
-      const res = await fetch(`${BASE_URL}/api/v1/goal-tracker/create`, {
+      const res = await fetch(`${VITE_BASE_API}/goal-tracker/create`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

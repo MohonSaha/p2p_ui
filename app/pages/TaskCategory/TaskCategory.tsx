@@ -5,6 +5,7 @@ import { Input } from "~/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
 import { toast } from "sonner";
 import { CategoryRow } from "./CategoryRow";
+import { VITE_BASE_API } from "~/lib/serverUrls";
 
 export interface TaskCategory {
   id: number;
@@ -13,9 +14,6 @@ export interface TaskCategory {
   created_at: string;
   updated_at: string;
 }
-
-const BASE_URL =
-  "https://p2pserver-production-a821.up.railway.app/api/v1/task-category";
 
 const TaskCategory = () => {
   const [categories, setCategories] = useState<TaskCategory[]>([]);
@@ -26,7 +24,7 @@ const TaskCategory = () => {
   const fetchCategories = async () => {
     try {
       setFetching(true);
-      const res = await fetch(`${BASE_URL}`);
+      const res = await fetch(`${VITE_BASE_API}/task-category`);
       if (!res.ok) throw new Error("Failed to fetch categories");
       const data: TaskCategory[] = await res.json();
       setCategories(data.filter((c) => !c.isDeleted));
@@ -49,7 +47,7 @@ const TaskCategory = () => {
 
     try {
       setLoading(true);
-      const res = await fetch(`${BASE_URL}/create`, {
+      const res = await fetch(`${VITE_BASE_API}/task-category/create`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ category: name }),
@@ -86,7 +84,7 @@ const TaskCategory = () => {
     );
 
     try {
-      const res = await fetch(`${BASE_URL}/${id}`, {
+      const res = await fetch(`${VITE_BASE_API}/task-category/${id}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ category: name }),
@@ -104,7 +102,7 @@ const TaskCategory = () => {
 
   const handleDelete = async (id: number) => {
     try {
-      const res = await fetch(`${BASE_URL}/${id}`, {
+      const res = await fetch(`${VITE_BASE_API}/task-category/${id}`, {
         method: "DELETE",
       });
       if (!res.ok) throw new Error();

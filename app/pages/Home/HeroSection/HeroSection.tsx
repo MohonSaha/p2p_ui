@@ -4,11 +4,8 @@ import {
   StatModal,
   type StatModalContent,
 } from "~/components/shared/dialogs/Statmodal";
-import {
-  API_BASE,
-  type GroupedPlans,
-  type Task,
-} from "../DailyPlanner/DailyPlanner";
+import { type GroupedPlans, type Task } from "../DailyPlanner/DailyPlanner";
+import { VITE_BASE_API } from "~/lib/serverUrls";
 
 export default function HeroSection() {
   const [plans, setPlans] = useState<GroupedPlans>({});
@@ -27,7 +24,7 @@ export default function HeroSection() {
   const fetchTasks = useCallback(async () => {
     try {
       setError(null);
-      const res = await fetch(API_BASE);
+      const res = await fetch(VITE_BASE_API + "/daily-completion");
       if (!res.ok) throw new Error("Failed to fetch tasks");
       const data: Task[] = await res.json();
 

@@ -1,87 +1,3 @@
-// import { useState } from "react";
-// import {
-//   Dialog,
-//   DialogContent,
-//   DialogHeader,
-//   DialogTitle,
-//   DialogFooter,
-// } from "~/components/ui/dialog";
-// import { Button } from "~/components/ui/button";
-// import { Input } from "~/components/ui/input";
-// import { Label } from "~/components/ui/label";
-// import {
-//   Select,
-//   SelectContent,
-//   SelectItem,
-//   SelectTrigger,
-//   SelectValue,
-// } from "~/components/ui/select";
-// import type { GoalValueType } from "~/types/monthly-map";
-
-// interface Props {
-//   open: boolean;
-//   onClose: () => void;
-//   onAdd: (name: string, valueType: GoalValueType) => void;
-// }
-
-// export function AddGoalDialog({ open, onClose, onAdd }: Props) {
-//   const [name, setName] = useState("");
-//   const [valueType, setValueType] = useState<GoalValueType>("boolean");
-
-//   const handleSubmit = () => {
-//     if (!name.trim()) return;
-//     onAdd(name.trim(), valueType);
-//     setName("");
-//     setValueType("boolean");
-//     onClose();
-//   };
-
-//   return (
-//     <Dialog open={open} onOpenChange={(o) => !o && onClose()}>
-//       <DialogContent className="sm:max-w-md">
-//         <DialogHeader>
-//           <DialogTitle>Add New Goal</DialogTitle>
-//         </DialogHeader>
-//         <div className="space-y-4 py-2">
-//           <div className="space-y-2">
-//             <Label htmlFor="goal-name">Goal Name</Label>
-//             <Input
-//               id="goal-name"
-//               placeholder="e.g., 4hr Study"
-//               value={name}
-//               onChange={(e) => setName(e.target.value)}
-//               onKeyDown={(e) => e.key === "Enter" && handleSubmit()}
-//             />
-//           </div>
-//           <div className="space-y-2">
-//             <Label>Value Type</Label>
-//             <Select
-//               value={valueType}
-//               onValueChange={(v) => setValueType(v as GoalValueType)}
-//             >
-//               <SelectTrigger className="w-full">
-//                 <SelectValue />
-//               </SelectTrigger>
-//               <SelectContent>
-//                 <SelectItem value="boolean">Yes / No</SelectItem>
-//                 <SelectItem value="text">Number / Text</SelectItem>
-//               </SelectContent>
-//             </Select>
-//           </div>
-//         </div>
-//         <DialogFooter>
-//           <Button variant="outline" onClick={onClose}>
-//             Cancel
-//           </Button>
-//           <Button onClick={handleSubmit} disabled={!name.trim()}>
-//             Add Goal
-//           </Button>
-//         </DialogFooter>
-//       </DialogContent>
-//     </Dialog>
-//   );
-// }
-
 import { useState } from "react";
 import {
   Dialog,
@@ -101,10 +17,7 @@ import {
   SelectValue,
 } from "~/components/ui/select";
 import type { GoalValueType } from "~/types/monthly-map";
-
-const API_BASE =
-  import.meta.env.VITE_API_BASE_URL ??
-  "https://p2pserver-production-a821.up.railway.app/api/v1";
+import { VITE_BASE_API } from "~/lib/serverUrls";
 
 interface Props {
   open: boolean;
@@ -143,7 +56,7 @@ export function AddGoalDialog({ open, onClose, onAdd, goalDate }: Props) {
     };
 
     try {
-      const res = await fetch(`${API_BASE}/monthly-goal/create`, {
+      const res = await fetch(`${VITE_BASE_API}/monthly-goal/create`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),

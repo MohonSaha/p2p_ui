@@ -1,11 +1,11 @@
+import { VITE_BASE_API } from "./serverUrls";
 import type { TimeEntry } from "./time-utils";
 
-const BASE_API = "https://p2pserver-production-a821.up.railway.app";
-const API_ENDPOINT = "/api/v1/time-entry/today/entries";
+const API_ENDPOINT = "/time-entry/today/entries";
 
 export async function fetchTodayEntries(): Promise<TimeEntry[]> {
   try {
-    const response = await fetch(`${BASE_API}${API_ENDPOINT}`, {
+    const response = await fetch(`${VITE_BASE_API}${API_ENDPOINT}`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
