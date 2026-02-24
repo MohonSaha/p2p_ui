@@ -42,7 +42,7 @@ const TaskCategoryDialog = ({
     try {
       setFetchLoading(true);
       setError(null);
-      const res = await fetch(`${VITE_BASE_API}task-category`);
+      const res = await fetch(`${VITE_BASE_API}/task-category`);
       if (!res.ok) throw new Error("Failed to fetch categories");
       const data: Category[] = await res.json();
       setCategories(data);
