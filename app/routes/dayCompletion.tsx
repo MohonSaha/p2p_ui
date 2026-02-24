@@ -1,11 +1,19 @@
 import { useState } from "react";
-import { ClipboardList, AlertCircle, Layers, SwatchBook } from "lucide-react";
+import {
+  ClipboardList,
+  AlertCircle,
+  Layers,
+  SwatchBook,
+  ArrowLeft,
+} from "lucide-react";
 import { useTasks, useTaskStacks } from "~/hooks/use-tasks";
 import DailyPlanner from "~/pages/Home/DailyPlanner/DailyPlanner";
 import DueTasksManager from "~/pages/DailyCompletion/DueTasksManager";
 import { SectionContainer } from "~/components/shared/SectionContainer";
 import TaskStackView from "~/pages/DailyCompletion/TaskStackView";
 import TaskCategory from "~/pages/TaskCategory/TaskCategory";
+import { Button } from "~/components/ui/button";
+import { useNavigate } from "react-router";
 
 type Tab = "planner" | "due" | "stacks" | "category";
 
@@ -25,6 +33,7 @@ const tabs: { key: Tab; label: string; icon: React.ReactNode }[] = [
 ];
 
 const dayCompletion = () => {
+  const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState<Tab>("planner");
   const {
     grouped,
@@ -39,11 +48,11 @@ const dayCompletion = () => {
 
   return (
     <SectionContainer>
-      <div className="min-h-screen bg-dark pt-22">
+      <div className="min-h-screen bg-dark pt-20">
         {/* Header */}
         <header className="border-b border-border bg-dark">
           <div className="py-2 flex items-center justify-between w-full">
-            <div className="">
+            <div className="hidden sm:flex flex-col">
               <h1 className="text-xl font-bold text-foreground tracking-tight">
                 TaskFlow
               </h1>
@@ -51,6 +60,15 @@ const dayCompletion = () => {
                 Stay organized, stay productive
               </p>
             </div>
+
+            <Button
+              onClick={() => navigate(-1)}
+              size="sm"
+              className="inline-flex sm:hidden rounded-full p-1 bg-muted text-muted-foreground hover:bg-muted/80 hover:text-muted-foreground/90"
+              variant={"outline"}
+            >
+              <ArrowLeft className="h-4 w-4" />
+            </Button>
 
             <div className="flex items-center gap-1 bg-dark rounded-lg p-1">
               {tabs.map((tab) => (

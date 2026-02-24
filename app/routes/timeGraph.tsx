@@ -1,12 +1,15 @@
 import { useEffect, useState } from "react";
-import { CalendarDays, ChartBar, ChartPie } from "lucide-react";
+import { ArrowLeft, CalendarDays, ChartBar, ChartPie } from "lucide-react";
 import { SectionContainer } from "~/components/shared/SectionContainer";
 import { DailyPieChart } from "~/pages/TimeGraph/DailyPieChart";
 import { MonthlyBarChart } from "~/pages/TimeGraph/MonthlyBarChart";
 import { StatsCards } from "~/pages/TimeGraph/StatsCards";
 import type { TimeEntry } from "~/lib/time-utils";
-import { fetchTodayEntries } from "~/lib/api";
+import { fetchEntriesByDate } from "~/lib/api";
 import { WeeklyBarChart } from "~/pages/TimeGraph/WeeklyBarChart";
+import { format } from "date-fns";
+import { Button } from "~/components/ui/button";
+import { useNavigate } from "react-router";
 
 type Tab = "daily" | "weekly" | "monthly";
 
@@ -29,39 +32,43 @@ const tabs: { key: Tab; label: string; icon: React.ReactNode }[] = [
 ];
 
 function TimeGraph() {
+  const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState<Tab>("daily");
-  const [entries, setEntries] = useState<TimeEntry[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<Error | null>(null);
 
-  const loadEntries = async () => {
+  const today = new Date();
+  const [selectedDate, setSelectedDate] = useState<Date>(today);
+  const [dailyEntries, setDailyEntries] = useState<TimeEntry[]>([]);
+  const [dailyLoading, setDailyLoading] = useState(true);
+  const [dailyError, setDailyError] = useState<Error | null>(null);
+
+  const loadDailyEntries = async (date: Date) => {
     try {
-      setLoading(true);
-      setError(null);
-      const data = await fetchTodayEntries();
-      setEntries(data);
+      setDailyLoading(true);
+      setDailyError(null);
+      const data = await fetchEntriesByDate(format(date, "yyyy-MM-dd"));
+      setDailyEntries(data);
     } catch (err) {
-      setError(err instanceof Error ? err : new Error("Unknown error"));
+      setDailyError(err instanceof Error ? err : new Error("Unknown error"));
     } finally {
-      setLoading(false);
+      setDailyLoading(false);
     }
   };
 
   useEffect(() => {
-    loadEntries();
-    const interval = setInterval(loadEntries, 30000);
+    loadDailyEntries(selectedDate);
+    const interval = setInterval(() => loadDailyEntries(selectedDate), 30000);
     return () => clearInterval(interval);
-  }, []);
+  }, [selectedDate]);
 
-  const today = new Date().toISOString().split("T")[0];
+  const todayStr = format(today, "yyyy-MM-dd");
 
   return (
     <SectionContainer>
-      <div className="min-h-screen bg-dark pt-22">
+      <div className="min-h-screen bg-dark pt-20">
         {/* Header */}
         <header className="border-b border-border bg-dark">
           <div className="py-2 flex items-center justify-between w-full">
-            <div>
+            <div className="hidden sm:flex flex-col">
               <h1 className="text-xl font-bold text-foreground tracking-tight">
                 TaskGraph
               </h1>
@@ -69,6 +76,15 @@ function TimeGraph() {
                 Everyone has the same 24 hours
               </p>
             </div>
+
+            <Button
+              onClick={() => navigate(-1)}
+              size="sm"
+              className="inline-flex sm:hidden rounded-full p-1 bg-muted text-muted-foreground hover:bg-muted/80 hover:text-muted-foreground/90"
+              variant={"outline"}
+            >
+              <ArrowLeft className="h-4 w-4" />
+            </Button>
 
             <div className="flex items-center gap-1 bg-dark rounded-lg p-1">
               {tabs.map((tab) => (
@@ -93,23 +109,28 @@ function TimeGraph() {
         <main className="py-6">
           {activeTab === "daily" && (
             <div className="space-y-6">
-              <StatsCards entries={entries} dateStr={today} />
-              <DailyPieChart entries={entries} />
+              <DailyPieChart
+                entries={dailyEntries}
+                loading={dailyLoading}
+                error={dailyError}
+                selectedDate={selectedDate}
+                onDateChange={setSelectedDate}
+              />
+              <StatsCards entries={dailyEntries} dateStr={todayStr} />
             </div>
           )}
 
           {activeTab === "weekly" && (
             <div className="space-y-6">
-              <StatsCards entries={entries} dateStr={today} />
-              {/* Swap in your WeeklyBarChart or similar component here */}
-              <WeeklyBarChart entries={entries} />
+              <StatsCards entries={dailyEntries} dateStr={todayStr} />
+              <WeeklyBarChart entries={dailyEntries} />
             </div>
           )}
 
           {activeTab === "monthly" && (
             <div className="space-y-6">
-              <StatsCards entries={entries} dateStr={today} />
-              <MonthlyBarChart entries={entries} />
+              <StatsCards entries={dailyEntries} dateStr={todayStr} />
+              <MonthlyBarChart entries={dailyEntries} />
             </div>
           )}
 

@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useMemo } from "react";
 import { format } from "date-fns";
 import { CalendarIcon } from "lucide-react";
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from "recharts";
@@ -23,6 +23,10 @@ const TOTAL_DAY_SECONDS = 24 * 3600;
 
 interface DailyPieChartProps {
   entries: TimeEntry[];
+  loading: boolean;
+  error: Error | null;
+  selectedDate: Date;
+  onDateChange: (date: Date) => void;
 }
 
 const CustomTooltip = ({ active, payload }: any) => {
@@ -43,19 +47,15 @@ const CustomTooltip = ({ active, payload }: any) => {
   return null;
 };
 
-export function DailyPieChart({ entries }: DailyPieChartProps) {
-  const today = new Date();
-  const [date, setDate] = useState<Date>(today);
-
-  const dateStr = format(date, "yyyy-MM-dd");
-
-  const filteredEntries = useMemo(
-    () => entries.filter((e) => e.entryDate === dateStr),
-    [entries, dateStr]
-  );
-
+export function DailyPieChart({
+  entries,
+  loading,
+  error,
+  selectedDate,
+  onDateChange,
+}: DailyPieChartProps) {
   const chartData = useMemo(() => {
-    const categories = groupByCategory(filteredEntries);
+    const categories = groupByCategory(entries);
     const trackedTotal = categories.reduce((sum, c) => sum + c.totalSeconds, 0);
     const untrackedSeconds = Math.max(0, TOTAL_DAY_SECONDS - trackedTotal);
 
@@ -67,7 +67,7 @@ export function DailyPieChart({ entries }: DailyPieChartProps) {
         color: UNTRACKED_COLOR,
       },
     ];
-  }, [filteredEntries]);
+  }, [entries]);
 
   const trackedTotal = chartData
     .filter((d) => d.category !== "Untracked")
@@ -82,7 +82,7 @@ export function DailyPieChart({ entries }: DailyPieChartProps) {
           </CardTitle>
 
           <p className="text-sm text-slate-400 mt-1">
-            {format(date, "EEEE, MMMM d, yyyy")}
+            {format(selectedDate, "EEEE, MMMM d, yyyy")}
           </p>
         </div>
 
@@ -92,11 +92,11 @@ export function DailyPieChart({ entries }: DailyPieChartProps) {
               variant="outline"
               className={cn(
                 "w-[200px] justify-start text-left font-normal border-slate-700 bg-slate-900 text-slate-200 hover:bg-slate-800 hover:text-white",
-                !date && "text-slate-500"
+                !selectedDate && "text-slate-500"
               )}
             >
               <CalendarIcon className="mr-2 h-4 w-4" />
-              {format(date, "PPP")}
+              {format(selectedDate, "PPP")}
             </Button>
           </PopoverTrigger>
           <PopoverContent
@@ -105,8 +105,8 @@ export function DailyPieChart({ entries }: DailyPieChartProps) {
           >
             <Calendar
               mode="single"
-              selected={date}
-              onSelect={(d) => d && setDate(d)}
+              selected={selectedDate}
+              onSelect={(d) => d && onDateChange(d)}
               initialFocus
               className={cn("p-3")}
             />
@@ -115,69 +115,79 @@ export function DailyPieChart({ entries }: DailyPieChartProps) {
       </CardHeader>
 
       <CardContent>
-        <div className="flex flex-col lg:flex-row items-center gap-6">
-          <div className="w-full lg:w-1/2 h-[300px]">
-            <ResponsiveContainer width="100%" height="100%">
-              <PieChart>
-                <Pie
-                  data={chartData}
-                  cx="50%"
-                  cy="50%"
-                  innerRadius={60}
-                  outerRadius={110}
-                  paddingAngle={2}
-                  dataKey="totalSeconds"
-                  nameKey="category"
-                  strokeWidth={0}
-                >
-                  {chartData.map((entry, index) => (
-                    <Cell
-                      key={entry.category}
-                      fill={
-                        entry.category === "Untracked"
-                          ? UNTRACKED_COLOR
-                          : CHART_COLORS[index % CHART_COLORS.length]
-                      }
-                    />
-                  ))}
-                </Pie>
-                <Tooltip content={<CustomTooltip />} />
-              </PieChart>
-            </ResponsiveContainer>
+        {loading ? (
+          <div className="flex items-center justify-center h-[300px] text-slate-400">
+            Loading...
           </div>
-          <div className="w-full lg:w-1/2 space-y-3">
-            <div className="flex items-center justify-between pb-2 border-b border-slate-700/50">
-              <span className="text-sm font-medium text-slate-400">
-                Total Tracked
-              </span>
-              <span className="font-mono text-sm font-semibold text-white">
-                {formatDuration(trackedTotal)}
-              </span>
+        ) : error ? (
+          <div className="flex items-center justify-center h-[300px] text-red-400">
+            Failed to load data
+          </div>
+        ) : (
+          <div className="flex flex-col lg:flex-row items-center gap-6">
+            <div className="w-full lg:w-1/2 h-[300px]">
+              <ResponsiveContainer width="100%" height="100%">
+                <PieChart>
+                  <Pie
+                    data={chartData}
+                    cx="50%"
+                    cy="50%"
+                    innerRadius={60}
+                    outerRadius={110}
+                    paddingAngle={2}
+                    dataKey="totalSeconds"
+                    nameKey="category"
+                    strokeWidth={0}
+                  >
+                    {chartData.map((entry, index) => (
+                      <Cell
+                        key={entry.category}
+                        fill={
+                          entry.category === "Untracked"
+                            ? UNTRACKED_COLOR
+                            : CHART_COLORS[index % CHART_COLORS.length]
+                        }
+                      />
+                    ))}
+                  </Pie>
+                  <Tooltip content={<CustomTooltip />} />
+                </PieChart>
+              </ResponsiveContainer>
             </div>
-            {chartData.map((item, index) => (
-              <div
-                key={item.category}
-                className="flex items-center justify-between"
-              >
-                <div className="flex items-center gap-2">
-                  <div
-                    className="h-3 w-3 rounded-full"
-                    style={{
-                      backgroundColor:
-                        item.category === "Untracked"
-                          ? UNTRACKED_COLOR
-                          : CHART_COLORS[index % CHART_COLORS.length],
-                    }}
-                  />
-                  <span className="text-sm text-white">{item.category}</span>
-                </div>
-                <span className="font-mono text-sm text-slate-400">
-                  {formatDuration(item.totalSeconds)}
+            <div className="w-full lg:w-1/2 space-y-3">
+              <div className="flex items-center justify-between pb-2 border-b border-slate-700/50">
+                <span className="text-sm font-medium text-slate-400">
+                  Total Tracked
+                </span>
+                <span className="font-mono text-sm font-semibold text-white">
+                  {formatDuration(trackedTotal)}
                 </span>
               </div>
-            ))}
+              {chartData.map((item, index) => (
+                <div
+                  key={item.category}
+                  className="flex items-center justify-between"
+                >
+                  <div className="flex items-center gap-2">
+                    <div
+                      className="h-3 w-3 rounded-full"
+                      style={{
+                        backgroundColor:
+                          item.category === "Untracked"
+                            ? UNTRACKED_COLOR
+                            : CHART_COLORS[index % CHART_COLORS.length],
+                      }}
+                    />
+                    <span className="text-sm text-white">{item.category}</span>
+                  </div>
+                  <span className="font-mono text-sm text-slate-400">
+                    {formatDuration(item.totalSeconds)}
+                  </span>
+                </div>
+              ))}
+            </div>
           </div>
-        </div>
+        )}
       </CardContent>
     </Card>
   );

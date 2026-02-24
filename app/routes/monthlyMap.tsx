@@ -1,6 +1,13 @@
 import { useState, useEffect, useCallback } from "react";
 import { Button } from "~/components/ui/button";
-import { Plus, CalendarDays, ChevronLeft, ChevronRight } from "lucide-react";
+import {
+  Plus,
+  CalendarDays,
+  ChevronLeft,
+  ChevronRight,
+  ChartPie,
+  AlarmClockCheck,
+} from "lucide-react";
 import {
   getCurrentMonth,
   getAdjacentMonth,
@@ -12,6 +19,7 @@ import { AddGoalDialog } from "~/pages/MonthlyMap/AddGoalDialog";
 import { MonthPickerDialog } from "~/pages/MonthlyMap/MonthPickerDialog";
 import { SectionContainer } from "~/components/shared/SectionContainer";
 import { VITE_BASE_API } from "~/lib/serverUrls";
+import { useNavigate } from "react-router";
 
 export interface ApiGoal {
   id: number;
@@ -36,6 +44,7 @@ export interface ApiTrackerEntry {
 }
 
 const MonthlyMap = () => {
+  const navigate = useNavigate();
   const currentMonth = getCurrentMonth();
   const [selectedMonth, setSelectedMonth] = useState(currentMonth);
   const [addGoalOpen, setAddGoalOpen] = useState(false);
@@ -198,10 +207,28 @@ const MonthlyMap = () => {
             >
               <CalendarDays className="h-5 w-5" />
             </Button>
-            <div className="ml-auto">
+            <div className="ml-auto space-x-2">
               <Button onClick={() => setAddGoalOpen(true)} size="sm">
-                <Plus className="h-4 w-4 mr-1" />
+                <Plus className="h-4 w-4 mr-0 sm:mr-1" />
                 <span className="hidden sm:inline-flex">Add Goal</span>
+              </Button>
+
+              <Button
+                onClick={() => navigate("/time-graph")}
+                size="sm"
+                className="inline-flex sm:hidden"
+              >
+                <ChartPie className="h-4 w-4" />
+                <span className="hidden sm:inline-flex">Time Graph</span>
+              </Button>
+
+              <Button
+                onClick={() => navigate("/day-completion")}
+                size="sm"
+                className="inline-flex sm:hidden"
+              >
+                <AlarmClockCheck className="h-4 w-4" />
+                <span className="hidden sm:inline-flex">Daily Completion</span>
               </Button>
             </div>
           </div>
